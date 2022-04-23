@@ -1,12 +1,23 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema
+let mongoose = require('mongoose');
+let User = require('../model/user');
+let Schema = mongoose.Schema;
 
-let schemaMatiere = Schema({
-    idMatiere: Number,
+let MatiereSchema = new Schema({
+    idMatiere:Number,
     libelle:String,
     idUser:Number,
     image:String
-})
-
-module.exports = mongoose.model('matieres', schemaMatiere);
-
+},{
+    collection: 'matieres',
+    timestamps: true
+  });
+MatiereSchema.virtual('prof', {
+    ref: [User],
+    localField: 'idUser',
+    foreignField: 'idUser',
+    justOne: true
+});
+MatiereSchema.set('toJSON', { virtuals: true });
+MatiereSchema.set('toObject', { virtuals: true });
+// C'est à travers ce modèle Mongoose qu'on pourra faire le CRUD
+module.exports = mongoose.model('matieres', MatiereSchema, 'matieres');
