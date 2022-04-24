@@ -2,6 +2,7 @@ let mongoose = require('mongoose');
 let Matiere = require('../model/matiere');
 let User = require('../model/user');
 let Schema = mongoose.Schema;
+var aggregatePaginate = require("mongoose-aggregate-paginate-v2");
 let AssignmentSchema = new Schema({
     id: Number,
     idAuteur: Number,
@@ -29,6 +30,7 @@ AssignmentSchema.virtual('auteur', {
 });
 AssignmentSchema.set('toJSON', { virtuals: true });
 AssignmentSchema.set('toObject', { virtuals: true });
+AssignmentSchema.plugin(aggregatePaginate);
 module.exports = mongoose.model('Assignment', AssignmentSchema, 'assignments');
 // module.exports.Matiere = mongoose.model('Matiere', MatiereSchema, 'matieres');
 // module.exports.User = mongoose.model('User', UsersSchema, 'users');

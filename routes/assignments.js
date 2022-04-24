@@ -2,21 +2,22 @@ let Assignment = require('../model/assignment');
 
 //Récupérer tous les assignments (GET)
 function getAssignments(req, res) {
-    Assignment.find()
-        .populate({
-            path: 'matiere',
-            populate: {
-                path: 'prof',
-            }
-        })
-        .populate('auteur')
-        .exec((err, assignments) => {
-            if (err) {
-                res.status(500).send(err);
-            } else {
-                res.status(200).json(assignments);
-            }
-        });
+    var aggregateQuery = Assignment.aggregate([
+        {$lookup: {from: 'users', localField: 'idAuteur', foreignField: 'idUser', as: 'auteur'}},
+        {$lookup: {from: 'matieres', localField: 'idMatiere', foreignField: 'idMatiere', as: 'matiere'}},
+        {$lookup: {from: 'users', localField: 'matiere.idUser', foreignField: 'idUser', as: 'prof'}},
+    ]);
+    Assignment.aggregatePaginate(aggregateQuery, {
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 10,
+    },
+    (err, assignments) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.status(200).json(assignments);
+        }
+    });
 }
 
 // Récupérer un assignment par son id (GET)
