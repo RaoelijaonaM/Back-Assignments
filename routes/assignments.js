@@ -1,96 +1,123 @@
+const express = require('express');
+let router = express.Router();
 let Assignment = require('../model/assignment');
 
 //Récupérer tous les assignments (GET)
-function getAssignments(req, res) {
+router
+  .route('/')
+  .get((req, res) => {
     var aggregateQuery = Assignment.aggregate([
-        {$lookup: {from: 'users', localField: 'idAuteur', foreignField: 'idUser', as: 'auteur'}},
-        {$lookup: {from: 'matieres', localField: 'idMatiere', foreignField: 'idMatiere', as: 'matiere'}},
-        {$lookup: {from: 'users', localField: 'matiere.idUser', foreignField: 'idUser', as: 'prof'}},
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'idAuteur',
+          foreignField: 'idUser',
+          as: 'auteur',
+        },
+      },
+      {
+        $lookup: {
+          from: 'matieres',
+          localField: 'idMatiere',
+          foreignField: 'idMatiere',
+          as: 'matiere',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'matiere.idUser',
+          foreignField: 'idUser',
+          as: 'prof',
+        },
+      },
     ]);
-    Assignment.aggregatePaginate(aggregateQuery, {
+    Assignment.aggregatePaginate(
+      aggregateQuery,
+      {
         page: parseInt(req.query.page) || 1,
         limit: parseInt(req.query.limit) || 10,
-    },
-    (err, assignments) => {
+      },
+      (err, assignments) => {
         if (err) {
-            res.status(500).send(err);
+          res.status(500).send(err);
         } else {
-            res.status(200).json(assignments);
+          res.status(200).json(assignments);
         }
-    });
-}
-
-// Récupérer un assignment par son id (GET)
-function getAssignment(req, res) {
-    let assignmentId = req.params.id;
-    Assignment.findOne({ id: assignmentId })
-        .populate({
-            path: 'matiere',
-            populate: {
-                path: 'prof',
-            }
-        })
-        .populate('auteur')
-        .exec((err, assignments) => {
-            if (err) {
-                res.status(500).send(err);
-            } else {
-                res.status(200).json(assignments);
-            }
-        });
-}
-
-// Ajout d'un assignment (POST)
-function postAssignment(req, res) {
+      }
+    );
+  })
+  // Ajout d'un assignment (POST)
+  .post((req, res) => {
     let assignment = new Assignment();
     assignment.id = Math.floor(Math.random() * 100);
     assignment.nom = req.body.nom;
     assignment.dateRendu = req.body.dateRendu;
     assignment.rendu = req.body.rendu;
 
-    console.log("POST assignment reçu :");
-    console.log(assignment)
+    console.log('POST assignment reçu :');
+    console.log(assignment);
 
     assignment.save((err) => {
-        if (err) {
-            console.log("err", err);
-            res.send('cant post assignment ', err);
-        }
-        res.json({ message: `${assignment.nom} saved!` })
-    })
-}
-
-// Update d'un assignment (PUT)
-function updateAssignment(req, res) {
-    console.log("UPDATE recu assignment : ");
-    console.log(req.body);
-    Assignment.findByIdAndUpdate(req.body._id, req.body, { new: true }, (err, assignment) => {
-        if (err) {
-            console.log(err);
-            res.send(err)
-        } else {
-            res.json({ message: 'updated' })
-        }
-
-        // console.log('updated ', assignment)
+      if (err) {
+        console.log('err', err);
+        res.send('cant post assignment ', err);
+      }
+      res.json({ message: `${assignment.nom} saved!` });
     });
-
-}
-
-// suppression d'un assignment (DELETE)
-function deleteAssignment(req, res) {
-    Assignment.findByIdAndRemove(req.params.id, (err, assignment) => {
+  })
+  //update assignment
+  .put((req, res) => {
+    console.log('UPDATE recu assignment : ');
+    console.log(req.body);
+    Assignment.findByIdAndUpdate(
+      req.body._id,
+      req.body,
+      { new: true },
+      (err, assignment) => {
         if (err) {
-            console.log("erreur", err);
-            res.send(err);
+          console.log(err);
+          res.send(err);
+        } else {
+          res.json({ message: 'updated' });
         }
-        else {
-            console.log("assignment supprimé", assignment);
-            res.json({ message: `${assignment.nom} deleted` });
+        // console.log('updated ', assignment)
+      }
+    );
+  });
+
+// Récupérer un assignment par son id (GET)
+router
+  .route('/:id')
+  .get((req, res) => {
+    let assignmentId = req.params.id;
+    Assignment.findOne({ id: assignmentId })
+      .populate({
+        path: 'matiere',
+        populate: {
+          path: 'prof',
+        },
+      })
+      .populate('auteur')
+      .exec((err, assignments) => {
+        if (err) {
+          res.status(500).send(err);
+        } else {
+          res.status(200).json(assignments);
         }
-    })
-}
+      });
+  })
+  // suppression d'un assignment (DELETE)
+  .delete((req, res) => {
+    Assignment.findByIdAndRemove(req.params.id, (err, assignment) => {
+      if (err) {
+        console.log('erreur', err);
+        res.send(err);
+      } else {
+        console.log('assignment supprimé', assignment);
+        res.json({ message: `${assignment.nom} deleted` });
+      }
+    });
+  });
 
-
-
-module.exports = { getAssignments, postAssignment, getAssignment, updateAssignment, deleteAssignment };
+module.exports = router;
