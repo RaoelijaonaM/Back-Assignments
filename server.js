@@ -2,7 +2,7 @@ let express = require('express');
 let app = express();
 let bodyParser = require('body-parser');
 let assignments = require('./routes/assignments');
-let matiere = require('./routes/route-matieres');
+let matieres = require('./routes/matieres');
 let users = require('./routes/users');
 let mongoose = require('mongoose');
 const { verifyAccessToken } = require('./routes/middleware');
@@ -52,6 +52,7 @@ const prefix = '/api';
 
 app.use(prefix + '/users', users);
 app.use(prefix + '/assignments', assignments);
+app.use(prefix + '/matieres', matieres);
 
 // app
 //   .route()
@@ -64,8 +65,6 @@ app.use(prefix + '/assignments', assignments);
 //   .route(prefix + '/assignments/:id')
 //   .get(assignment.getAssignment)
 //   .delete(assignment.deleteAssignment);
-
-app.route(prefix + '/matieres').get(matiere.getMatieres);
 
 // On démarre le serveur
 app.listen(port, '0.0.0.0');
