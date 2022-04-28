@@ -24,7 +24,7 @@ router.route('/login').post((req, res) => {
         const tokenUser = jwt.sign({ user }, 'secret', { expiresIn: '24h' });
         return res.status(200).json({ auth: true, token: tokenUser });
       } else {
-        return res.status(404).json('Login failed');
+        return res.status(404).json('Login failed: user not found');
       }
     }
   });

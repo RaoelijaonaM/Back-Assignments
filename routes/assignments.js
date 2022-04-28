@@ -100,9 +100,10 @@ router
       })
       .populate('auteur')
       .exec((err, assignments) => {
-        if (err) {
-          res.status(500).send(err);
-        } else {
+        if (err || assignments == null) {
+          console.log("erreur cannot found assignment");
+          res.status(500).send({error : "aucun assignment trouvé correspondant à l'id"});
+        } else{
           res.status(200).json(assignments);
         }
       });
