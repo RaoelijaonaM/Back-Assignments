@@ -49,21 +49,26 @@ router
   })
   // Ajout d'un assignment (POST)
   .post((req, res) => {
-    let assignment = new Assignment();
-    assignment.id = Math.floor(Math.random() * 100);
-    assignment.nom = req.body.nom;
-    assignment.dateRendu = req.body.dateRendu;
-    assignment.rendu = req.body.rendu;
+    let newAssignment = new Assignment();
+
+    newAssignment.id = req.body.id;
+    newAssignment.idAuteur = req.body.idAuteur;
+    newAssignment.idMatiere = req.body.idMatiere;
+    newAssignment.libelle = req.body.libelle;
+    newAssignment.dateRendu = req.body.dateRendu; //NEED FORMATTER?
+    newAssignment.note = req.body.note;
+    newAssignment.rq = req.body.rq;
+    newAssignment.rendu = req.body.rendu;
 
     console.log('POST assignment reçu :');
-    console.log(assignment);
+    console.log(newAssignment);
 
-    assignment.save((err) => {
+    newAssignment.save((err) => {
       if (err) {
         console.log('err', err);
         res.send('cant post assignment ', err);
       }
-      res.json({ message: `${assignment.nom} saved!` });
+      res.json({ message: `${newAssignment.libelle} saved!` });
     });
   })
   //update assignment
