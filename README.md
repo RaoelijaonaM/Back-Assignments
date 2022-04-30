@@ -2,7 +2,8 @@
 API pour l'application gestion de devoir 
 
 ### Fonctionnement:
-Lancez les commandes suivantes afin de tester localement les apis
+Lancez les commandes suivantes afin de tester localement les apis : </br>
+
     npm install
     node server.js
     
