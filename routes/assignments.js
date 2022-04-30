@@ -1,11 +1,12 @@
 const express = require('express');
 let router = express.Router();
 let Assignment = require('../model/assignment');
+const { verifyAccessToken } = require('./middleware');
 
 //Récupérer tous les assignments (GET)
 router
   .route('/')
-  .get((req, res) => {
+  .get(verifyAccessToken, (req, res) => {
     var aggregateQuery = Assignment.aggregate([
       {
         $lookup: {
@@ -48,7 +49,7 @@ router
     );
   })
   // Ajout d'un assignment (POST)
-  .post((req, res) => {
+  .post(verifyAccessToken, (req, res) => {
     let newAssignment = new Assignment();
 
     newAssignment.id = req.body.id;
@@ -72,7 +73,7 @@ router
     });
   })
   //update assignment
-  .put((req, res) => {
+  .put(verifyAccessToken, (req, res) => {
     console.log('UPDATE recu assignment : ');
     console.log(req.body);
     Assignment.findByIdAndUpdate(
@@ -94,7 +95,7 @@ router
 // Récupérer un assignment par son id (GET)
 router
   .route('/:id')
-  .get((req, res) => {
+  .get(verifyAccessToken, (req, res) => {
     let assignmentId = req.params.id;
     console.log(
       'GET assignment id :********************' +
@@ -162,7 +163,7 @@ router
     //   });
   })
   // suppression d'un assignment (DELETE)
-  .delete((req, res) => {
+  .delete(verifyAccessToken, (req, res) => {
     Assignment.findByIdAndRemove(req.params.id, (err, assignment) => {
       if (err) {
         console.log('erreur', err);
