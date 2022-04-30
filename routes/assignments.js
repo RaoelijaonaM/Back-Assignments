@@ -96,22 +96,70 @@ router
   .route('/:id')
   .get((req, res) => {
     let assignmentId = req.params.id;
-    Assignment.findOne({ id: assignmentId })
-      .populate({
-        path: 'matiere',
-        populate: {
-          path: 'prof',
+    console.log(
+      'GET assignment id :********************' +
+        assignmentId +
+        '********************'
+    );
+    var aggregateQuery = Assignment.aggregate([
+      {
+        $match: {
+          id: parseInt(assignmentId),
         },
-      })
-      .populate('auteur')
-      .exec((err, assignments) => {
-        if (err || assignments == null) {
-          console.log("erreur cannot found assignment");
-          res.status(500).send({error : "aucun assignment trouvé correspondant à l'id"});
-        } else{
-          res.status(200).json(assignments);
-        }
-      });
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'idAuteur',
+          foreignField: 'idUser',
+          as: 'auteur',
+        },
+      },
+      {
+        $lookup: {
+          from: 'matieres',
+          localField: 'idMatiere',
+          foreignField: 'idMatiere',
+          as: 'matiere',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'matiere.idUser',
+          foreignField: 'idUser',
+          as: 'prof',
+        },
+      },
+    ]);
+    aggregateQuery.exec((err, assignment) => {
+      console.log('miditra');
+      if (err) {
+        res.status(500).send(err);
+        console.log(err);
+      } else {
+        console.log(assignment);
+
+        res.status(200).json(assignment);
+      }
+    });
+
+    // Assignment.findOne({ id: assignmentId })
+    //   .populate({
+    //     path: 'matiere',
+    //     populate: {
+    //       path: 'prof',
+    //     },
+    //   })
+    //   .populate('auteur')
+    //   .exec((err, assignments) => {
+    //     if (err || assignments == null) {
+    //       console.log("erreur cannot found assignment");
+    //       res.status(500).send({error : "aucun assignment trouvé correspondant à l'id"});
+    //     } else{
+    //       res.status(200).json(assignments);
+    //     }
+    //   });
   })
   // suppression d'un assignment (DELETE)
   .delete((req, res) => {
