@@ -1,6 +1,10 @@
 # Back-Assignments
 API pour l'application gestion de devoir 
 
+### Membres du groupes:</br>
+  #### 13- RAHARISON Hajalalaina
+  #### 22-  RAOELIJAONA Mitia Ny Soa
+
 ### Fonctionnement:
 Lancez les commandes suivantes afin de tester localement les apis : </br>
 
