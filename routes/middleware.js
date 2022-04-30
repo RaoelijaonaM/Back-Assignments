@@ -1,8 +1,8 @@
 var jwt = require('jsonwebtoken');
 
 function verifyAccessToken(req, res, next) {
-  const token = req.headers['token'];
-  console.log('verifier Access token', token);
+  const tokenContent = req.headers['authorization'];
+  const token = tokenContent.split(' ')[1];
   try {
     const user = jwt.verify(token, 'secret');
     next();
